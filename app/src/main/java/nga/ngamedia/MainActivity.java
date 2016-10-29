@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity
 
     private RecyclerView mRecyclerView;
     private MoviesAdapter mAdapter;
+    private RecyclerView mRecyclerView2;
+    private MoviesAdapter mAdapter2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +67,13 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, 0, false));
         mAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
-        getPopularMovies();
+
+        mRecyclerView2 = (RecyclerView) findViewById(R.id.recyclerView2);
+        mRecyclerView2.setLayoutManager(new LinearLayoutManager(this, 0, false));
+        mAdapter2 = new MoviesAdapter(this);
+        mRecyclerView2.setAdapter(mAdapter2);
+
+        getPopularMedia();
 
     }
 
@@ -98,6 +106,27 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
+        if (id == R.id.menu_item_search) {
+            Intent movieActivityIntent = new Intent(this, MovieSubActivity.class);
+            movieActivityIntent.putExtra("EXTRA_CLASS","Search");
+            startActivity(movieActivityIntent);
+            return true;
+        }
+
+        if (id == R.id.menu_item_movie) {
+            Intent movieActivityIntent = new Intent(this, MovieSubActivity.class);
+            movieActivityIntent.putExtra("EXTRA_CLASS","Movie");
+            startActivity(movieActivityIntent);
+            return true;
+        }
+
+        if (id == R.id.menu_item_tv) {
+            Intent movieActivityIntent = new Intent(this, MovieSubActivity.class);
+            movieActivityIntent.putExtra("EXTRA_CLASS","Television");
+            startActivity(movieActivityIntent);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -126,7 +155,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void getPopularMovies() {
+    private void getPopularMedia() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint("http://api.themoviedb.org/3")
                 .setRequestInterceptor(new RequestInterceptor() {
@@ -142,6 +171,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void success(Movie.MovieResult movieResult, Response response) {
                 mAdapter.setMovieList(movieResult.getResults());
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                error.printStackTrace();
+            }
+        });
+
+        service.getPopularTV(new Callback<Movie.MovieResult>() {
+            @Override
+            public void success(Movie.MovieResult movieResult, Response response) {
+                mAdapter2.setMovieList(movieResult.getResults());
             }
 
             @Override
